@@ -129,7 +129,8 @@
   position: relative;
   min-height: 0;
   height: calc(100svh - var(--header-h) - var(--peek-h));
-  background: #f6f0e9;
+  /* latar studio foto: cahaya lembut di tengah, tepi hangat lebih gelap */
+  background: radial-gradient(120% 90% at 50% 38%, #fffaf5 0%, #f6eee5 45%, #eadccf 100%);
   overflow: hidden;
 }
 .ff-canvas { touch-action: none; }

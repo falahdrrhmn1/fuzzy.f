@@ -21,7 +21,7 @@ const GAP = 0.15; // jarak antar avatar & buket di mode banding (m)
 export function computeLayout(
   mode: SceneMode,
   bouquet: BuiltBouquet,
-  body: { sex: Sex; heightCm: number; weightKg: number },
+  body: { sex: Sex; heightCm: number; weightKg: number; quality?: 'standard' | 'high' },
 ): SceneLayout {
   const localBox = bouquet.localBox;
   if (mode === 'inspect') {

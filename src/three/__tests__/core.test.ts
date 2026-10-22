@@ -45,6 +45,30 @@ describe('kalibrasi buket', () => {
   }
 });
 
+describe('mode kualitas', () => {
+  it('mode Bagus: ukuran sama dengan Ringan (tinggi ±1%, lebar ±5%), ada lapisan bulu', () => {
+    for (const id of ['pink-tulip-lily', 'garden-mix']) {
+      const p = getProduct(id)!;
+      const std = buildBouquet(p, p.variants[0]!, { quality: 'standard' });
+      const hi = buildBouquet(p, p.variants[0]!, { quality: 'high' });
+      const bs = box(std.object);
+      const bh = box(hi.object);
+      expect(within((bh.max.y - bh.min.y) * 100, p.dimensions!.heightCm, 0.01)).toBe(true);
+      expect(within((bh.max.x - bh.min.x) * 100, p.dimensions!.widthCm, 0.05)).toBe(true);
+      expect(Math.abs((bh.max.y - bh.min.y) - (bs.max.y - bs.min.y))).toBeLessThan(1e-6);
+      expect(hi.triangles).toBeGreaterThan(std.triangles);
+      const kinds = new Set<string>();
+      hi.object.traverse((o) => o instanceof THREE.Mesh && kinds.add(String(o.userData.kind)));
+      expect(kinds.has('fur')).toBe(true);
+    }
+  });
+
+  it('avatar Bagus: tinggi tetap tepat', () => {
+    const a = buildAvatar({ sex: 'male', heightCm: 182, weightKg: 75, pose: 'holding', quality: 'high' });
+    expect(within(a.measuredCm.heightCm, 182, 0.005)).toBe(true);
+  });
+});
+
 describe('avatar', () => {
   for (const sex of ['female', 'male'] as const) {
     for (const h of [140, 165, 170, 200]) {

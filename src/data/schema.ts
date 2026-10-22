@@ -39,6 +39,12 @@ export const RecipeSchema = z.object({
   meshLayer: z.boolean(),
   cellophane: z.boolean(),
   fairyLights: z.boolean(),
+  /** motif kertas luar (dari foto) */
+  wrapperPattern: z.enum(['plain', 'check', 'stripe']).default('plain'),
+  /** stiker hati pada lembar belakang (terlihat di beberapa foto) */
+  heartSticker: z.boolean().default(false),
+  /** motif pita (mis. gingham di foto) */
+  ribbonPattern: z.enum(['plain', 'check', 'stripe']).default('plain'),
 });
 
 export const VariantSchema = z.object({

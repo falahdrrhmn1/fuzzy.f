@@ -84,6 +84,24 @@ saat berhenti (`sleep`/`rest`).
 - Model GLB dimuat lewat `useLoader(GLTFLoader)` di dalam `<Suspense>`. Geometrinya milik cache loader, jadi
   tidak di-dispose per buket.
 
+## Mode kualitas (Ringan / Bagus)
+
+State `quality` (`standard` | `high`). Mengganti kualitas me-*remount* `<Canvas>` (shadow map & shader perlu
+kompilasi ulang). Builder menerima `quality`; **ukuran tidak berubah** (diuji).
+
+| | Ringan | Bagus |
+|---|---|---|
+| Geometri | tabung 5 segmen, kelopak 6×8 | tabung 8 segmen, kelopak 10×14 |
+| Bulu | normal map serat + sheen | + 2 lapis *shell fur* (alpha-test) di semua permukaan kawat |
+| Bayangan | ContactShadows 512 | shadow map PCF soft 2048 dari key light + ContactShadows 1024 |
+| Pasca-proses | – | N8AO (ambient occlusion), Bloom (lampu), tone mapping Neutral (`HighEffects.tsx`, di-*lazy load*) |
+| DPR | 1–1,6 | 1–2 |
+| Segitiga (contoh) | 54–111k | 288–561k |
+
+Pencahayaan (kedua mode): key light hangat depan-kiri atas, fill dingin kanan, rim belakang, hemisphere,
+environment `RoomEnvironment`; tone mapping Neutral menjaga warna pastel. Latar belakang = gradasi CSS di balik
+kanvas transparan.
+
 ## Fallback
 
 - Tanpa WebGL: foto asli + ukuran + pesan.

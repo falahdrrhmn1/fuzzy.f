@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { Suspense, useCallback, useEffect, useReducer, useState } from 'react';
 import { canCompare, getProduct } from '../data/products';
 import { hasWebGL } from '../lib/webgl';
-import { initialState, studioReducer, type CameraPreset, type Mode } from '../state/studio';
+import { initialState, QUALITIES, studioReducer, type CameraPreset, type Mode, type Quality } from '../state/studio';
 import type { SceneInfo } from './scene/StudioCanvas';
 import { ControlPanel } from './ui/ControlPanel';
 import { CanvasLoading, PhotoFallback, SceneErrorBoundary } from './ui/Fallbacks';
@@ -17,6 +17,8 @@ const MODES: { id: Mode; label: string; short: string }[] = [
   { id: 'compare', label: 'Bandingkan Ukuran', short: 'Bandingkan' },
   { id: 'hold', label: 'Lihat Saat Dipegang', short: 'Dipegang' },
 ];
+
+const QUALITY_KEY = 'ff-quality';
 
 const PRESETS: { id: CameraPreset; label: string }[] = [
   { id: 'front', label: 'Depan' },
@@ -36,6 +38,30 @@ export function Studio({ initialProductId }: { initialProductId: string }) {
   const onInfo = useCallback((i: SceneInfo) => setInfo(i), []);
 
   useEffect(() => setWebgl(hasWebGL()), []);
+
+  // kualitas awal: pilihan tersimpan, atau Bagus untuk layar lebar dengan CPU memadai, selain itu Ringan
+  useEffect(() => {
+    let q: Quality | null = null;
+    try {
+      const saved = window.localStorage.getItem(QUALITY_KEY);
+      if (saved === 'high' || saved === 'standard') q = saved;
+    } catch {
+      /* storage diblokir: pakai deteksi */
+    }
+    if (!q) q = window.matchMedia('(min-width: 1024px)').matches && (navigator.hardwareConcurrency ?? 4) >= 4 ? 'high' : 'standard';
+    const forced = new URLSearchParams(window.location.search).get('quality');
+    if (forced === 'high' || forced === 'standard') q = forced;
+    dispatch({ type: 'quality', quality: q });
+  }, []);
+
+  const setQuality = (q: Quality) => {
+    dispatch({ type: 'quality', quality: q });
+    try {
+      window.localStorage.setItem(QUALITY_KEY, q);
+    } catch {
+      /* abaikan */
+    }
+  };
 
   const selectProduct = (id: string) => {
     const p = getProduct(id);
@@ -88,9 +114,13 @@ export function Studio({ initialProductId }: { initialProductId: string }) {
 
         {/* kamera */}
         <div className="pointer-events-none absolute inset-x-0 bottom-3 flex items-end justify-between gap-3 px-3">
-          <p className="hidden max-w-[16rem] text-xs leading-snug text-ink-soft xl:block">
-            Seret untuk memutar · scroll / cubit untuk zoom · klik kanan / dua jari untuk geser
-          </p>
+          <div className="ff-seg pointer-events-auto hidden lg:inline-flex" role="group" aria-label="Kualitas tampilan">
+            {QUALITIES.map((q) => (
+              <button key={q.id} type="button" aria-pressed={state.quality === q.id} title={q.hint} onClick={() => setQuality(q.id)}>
+                {q.label}
+              </button>
+            ))}
+          </div>
           <div className="ff-seg pointer-events-auto ml-auto max-w-full overflow-x-auto" role="group" aria-label="Sudut kamera">
             {PRESETS.map((p) => (
               <button key={p.id} type="button" className="!px-3" onClick={() => dispatch({ type: 'camera', preset: p.id })}>
@@ -109,7 +139,7 @@ export function Studio({ initialProductId }: { initialProductId: string }) {
         )}
       </section>
 
-      <ControlPanel product={product} variant={variant} state={state} dispatch={dispatch} info={info} onSelectProduct={selectProduct} />
+      <ControlPanel product={product} variant={variant} state={state} dispatch={dispatch} info={info} onSelectProduct={selectProduct} onQuality={setQuality} />
     </main>
   );
 }

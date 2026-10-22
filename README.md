@@ -77,6 +77,10 @@ public/products/<id>/     foto produk (salinan, sumber asli tidak diubah)
    kamera ortografis.
 4. **Lihat Saat Dipegang**: avatar memegang buket di depan perut.
 5. Ganti buket atau warna kapan saja tanpa memuat ulang halaman.
+6. **Kualitas**: *Ringan* (cepat, untuk HP) atau *Bagus* (bayangan lembut, ambient occlusion, bulu kawat
+   berlapis, detail lebih tinggi). Pilih di kiri bawah viewer (desktop) atau di tab Tampilan. Default: Bagus
+   untuk layar ≥1024 px, Ringan untuk HP; pilihan disimpan di browser. Ukuran fisik identik di kedua mode.
+   Bisa dipaksa lewat URL: `?quality=high` atau `?quality=standard`.
 
 Dokumen lain: `ARCHITECTURE.md`, `ASSET_PIPELINE.md`, `IMPLEMENTATION_STATUS.md`. `SPEC.md` adalah spesifikasi
 awal. Bila ada perbedaan, kode dan dokumen-dokumen tadi yang benar.

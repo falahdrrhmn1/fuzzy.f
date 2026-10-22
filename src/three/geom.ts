@@ -20,9 +20,22 @@ export const jitter = (r: Rng, amount: number) => (r() * 2 - 1) * amount;
 export class PartBag {
   private parts = new Map<string, { key: MatKey; geoms: THREE.BufferGeometry[] }>();
 
+  /**
+   * @param furShells jumlah lapisan "shell fur" yang ditambahkan otomatis pada permukaan kawat bulu
+   *   (mode Bagus). 0 = tanpa shell (mode Ringan).
+   */
+  constructor(private furShells = 0, private furStep = 0.0011) {}
+
   add(key: MatKey, geom: THREE.BufferGeometry, matrix?: THREE.Matrix4) {
     const g = normalizeAttributes(geom);
     if (matrix) g.applyMatrix4(matrix);
+    this.push(key, g);
+    if (this.furShells > 0 && (key.kind === 'fuzz' || key.kind === 'petal')) {
+      for (let s = 1; s <= this.furShells; s++) this.push({ kind: 'fur', color: key.color }, shell(g, this.furStep * s));
+    }
+  }
+
+  private push(key: MatKey, g: THREE.BufferGeometry) {
     const id = matId(key);
     const slot = this.parts.get(id) ?? { key, geoms: [] };
     slot.geoms.push(g);
@@ -42,6 +55,7 @@ export class PartBag {
       mesh.name = matId(key);
       // Lapisan transparan dirender setelah yang padat.
       if (key.kind === 'mesh' || key.kind === 'cello') mesh.renderOrder = 2;
+      mesh.userData.kind = key.kind;
       group.add(mesh);
     }
     this.parts.clear();
@@ -49,18 +63,68 @@ export class PartBag {
   }
 }
 
-/** Samakan atribut (position, normal, uv; indexed; tanpa groups) agar bisa di-merge. */
+const KEEP = new Set(['position', 'normal', 'uv', 'color']);
+
+/** Samakan atribut (position, normal, uv, color; indexed; tanpa groups) agar bisa di-merge. */
 function normalizeAttributes(geom: THREE.BufferGeometry): THREE.BufferGeometry {
   const g = geom.index ? geom : indexify(geom);
-  for (const name of Object.keys(g.attributes)) {
-    if (name !== 'position' && name !== 'normal' && name !== 'uv') g.deleteAttribute(name);
-  }
+  for (const name of Object.keys(g.attributes)) if (!KEEP.has(name)) g.deleteAttribute(name);
+  const count = g.getAttribute('position').count;
   if (!g.getAttribute('normal')) g.computeVertexNormals();
-  if (!g.getAttribute('uv')) {
-    const count = g.getAttribute('position').count;
-    g.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(count * 2), 2));
-  }
+  if (!g.getAttribute('uv')) g.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(count * 2), 2));
+  if (!g.getAttribute('color')) g.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(count * 3).fill(1), 3));
   g.clearGroups();
+  return g;
+}
+
+/** Warnai verteks dengan faktor gelap-terang f(u, v) ∈ ~[0.6, 1.1] (gradasi pangkal → ujung kelopak). */
+export function shade(geom: THREE.BufferGeometry, f: (u: number, v: number) => number) {
+  const uv = geom.getAttribute('uv');
+  const n = geom.getAttribute('position').count;
+  const c = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    const k = f(uv ? uv.getX(i) : 0, uv ? uv.getY(i) : 0);
+    c[i * 3] = c[i * 3 + 1] = c[i * 3 + 2] = k;
+  }
+  geom.setAttribute('color', new THREE.Float32BufferAttribute(c, 3));
+  return geom;
+}
+
+/** Salinan geometri yang digeser sepanjang normal (lapisan bulu). */
+export function shell(g: THREE.BufferGeometry, d: number) {
+  const s = g.clone();
+  const p = s.getAttribute('position');
+  const nrm = s.getAttribute('normal');
+  for (let i = 0; i < p.count; i++) p.setXYZ(i, p.getX(i) + nrm.getX(i) * d, p.getY(i) + nrm.getY(i) * d, p.getZ(i) + nrm.getZ(i) * d);
+  p.needsUpdate = true;
+  return s;
+}
+
+/** Pita datar selebar `width` mengikuti kurva; `up` menentukan orientasi lebar pita. */
+export function ribbonStrip(points: THREE.Vector3[], width: number, up: THREE.Vector3, samples = 32, closed = false) {
+  const curve = new THREE.CatmullRomCurve3(points, closed, 'centripetal');
+  const pos: number[] = [];
+  const uv: number[] = [];
+  const idx: number[] = [];
+  const side = new THREE.Vector3();
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples;
+    const p = curve.getPointAt(t);
+    const tan = curve.getTangentAt(t);
+    side.crossVectors(tan, up).normalize().multiplyScalar(width / 2);
+    if (side.lengthSq() < 1e-12) side.set(width / 2, 0, 0);
+    pos.push(p.x - side.x, p.y - side.y, p.z - side.z, p.x + side.x, p.y + side.y, p.z + side.z);
+    uv.push(0, t, 1, t);
+    if (i < samples) {
+      const a = i * 2;
+      idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  g.computeVertexNormals();
   return g;
 }
 
@@ -72,9 +136,9 @@ function indexify(geom: THREE.BufferGeometry) {
 }
 
 /** Tabung kawat bulu sepanjang titik-titik (tertutup untuk loop kelopak). */
-export function wireTube(points: THREE.Vector3[], radius: number, closed: boolean, segmentsPerPoint = 2) {
+export function wireTube(points: THREE.Vector3[], radius: number, closed: boolean, segmentsPerPoint = 2, radial = 5) {
   const curve = new THREE.CatmullRomCurve3(points, closed, 'centripetal');
-  return new THREE.TubeGeometry(curve, Math.max(8, points.length * segmentsPerPoint), radius, 5, closed);
+  return new THREE.TubeGeometry(curve, Math.max(8, points.length * segmentsPerPoint), radius, radial, closed);
 }
 
 export interface LoopOpts {

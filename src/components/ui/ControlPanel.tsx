@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type Dispatch, type ReactNode } from 'reac
 import { canCompare, PRODUCTS } from '../../data/products';
 import type { Product, Variant } from '../../data/schema';
 import { bmi, bmiCategory, HEIGHT_RANGE_CM, WEIGHT_RANGE_KG } from '../../lib/anthropometry';
-import type { StudioAction, StudioState } from '../../state/studio';
+import { QUALITIES, type Quality, type StudioAction, type StudioState } from '../../state/studio';
 import type { SceneInfo } from '../scene/StudioCanvas';
 
 type Tab = 'produk' | 'ukuran' | 'avatar' | 'tampilan';
@@ -24,9 +24,10 @@ interface Props {
   dispatch: Dispatch<StudioAction>;
   info: SceneInfo | null;
   onSelectProduct: (id: string) => void;
+  onQuality: (q: Quality) => void;
 }
 
-export function ControlPanel({ product, variant, state, dispatch, info, onSelectProduct }: Props) {
+export function ControlPanel({ product, variant, state, dispatch, info, onSelectProduct, onQuality }: Props) {
   const [tab, setTab] = useState<Tab>('produk');
   const [snap, setSnap] = useState<Snap>('peek');
   const [photo, setPhoto] = useState<string | null>(null);
@@ -208,6 +209,15 @@ export function ControlPanel({ product, variant, state, dispatch, info, onSelect
         </Section>
 
         <Section id="tampilan" tab={tab} title="Tampilan">
+          <p className="mb-2 text-sm">Kualitas render</p>
+          <div className="ff-seg mb-1 w-full" role="group" aria-label="Kualitas render">
+            {QUALITIES.map((q) => (
+              <button key={q.id} type="button" className="flex-1" aria-pressed={state.quality === q.id} onClick={() => onQuality(q.id)}>
+                {q.label}
+              </button>
+            ))}
+          </div>
+          <p className="mb-3 text-xs text-ink-soft">{QUALITIES.find((q) => q.id === state.quality)?.hint}. Ukuran tidak berubah antar mode.</p>
           <div className="flex flex-col gap-2">
             <Toggle label="Garis ukur" checked={state.showGuides} onChange={() => dispatch({ type: 'toggle', key: 'showGuides' })} />
             <Toggle

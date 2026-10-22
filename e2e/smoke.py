@@ -70,7 +70,7 @@ with sync_playwright() as p:
     if run('desktop'):
         print('# studio desktop')
         ctx, page, errors = new_page(browser, 1440, 900)
-        page.goto(BASE + '/studio/pink-tulip-lily?debug=1', wait_until='networkidle')
+        page.goto(BASE + '/studio/pink-tulip-lily?debug=1&quality=standard', wait_until='networkidle')
         wait_scene(page, 'inspect')
         page.screenshot(path=str(OUT / 'd-inspect.png'))
         d0 = dbg(page)
@@ -139,6 +139,20 @@ with sync_playwright() as p:
         check(page.get_by_role('button', name='Lihat Saat Dipegang').is_disabled(), 'jumbo: tombol Pegang nonaktif')
         check(dbg(page)['mode'] == 'inspect', 'jumbo: kembali ke mode Lihat 3D')
         page.screenshot(path=str(OUT / 'd-jumbo.png'))
+        # mode kualitas: Bagus tidak mengubah ukuran fisik, tidak error
+        page.get_by_role('button', name='Pink Tulip & Lily').click(); page.wait_for_timeout(2500)
+        before = dbg(page)['bouquetBox']
+        page.get_by_role('group', name='Kualitas tampilan').get_by_role('button', name='Bagus').click()
+        page.wait_for_function('() => window.__ffDebug.quality === "high"', timeout=180000)
+        page.wait_for_timeout(3000)
+        after = dbg(page)['bouquetBox']
+        same = all(abs(a - b) < 0.002 for k in ('min', 'max') for a, b in zip(before[k], after[k]))
+        check(abs((after['max'][1] - after['min'][1]) - (before['max'][1] - before['min'][1])) < 1e-6, 'mode Bagus: tinggi buket identik')
+        check(same, f'mode Bagus: Box3 buket sama (±2 mm) {before} vs {after}')
+        page.screenshot(path=str(OUT / 'd-quality-high.png'), timeout=240000)
+        page.get_by_role('group', name='Kualitas tampilan').get_by_role('button', name='Ringan').click()
+        page.wait_for_function('() => window.__ffDebug.quality === "standard"', timeout=60000)
+        check(page.evaluate("localStorage.getItem('ff-quality')") == 'standard', 'pilihan kualitas tersimpan')
         check(not errors, f'studio desktop: tanpa error console {errors[:3]}')
         ctx.close()
 
@@ -146,7 +160,7 @@ with sync_playwright() as p:
         print('# semua produk & varian (inspect)')
         ctx, page, errors = new_page(browser, 1100, 800)
         for pid in ['pink-lily-tulip', 'sunflower-tulip', 'brown-lily-rose', 'pink-tulip-lily', 'garden-mix', 'tulip-daisy', 'jumbo-tulip-lights']:
-            page.goto(f'{BASE}/studio/{pid}?debug=1', wait_until='networkidle')
+            page.goto(f'{BASE}/studio/{pid}?debug=1&quality=standard', wait_until='networkidle')
             wait_scene(page)
             page.screenshot(path=str(OUT / f'p-{pid}.png'))
             print('  ', pid, 'drawCalls', dbg(page)['drawCalls'])
@@ -157,7 +171,7 @@ with sync_playwright() as p:
         print('# studio mobile')
         for w, h in [(360, 740), (390, 844), (430, 932), (844, 390)]:
             ctx, page, errors = new_page(browser, w, h, mobile=True)
-            page.goto(BASE + '/studio/tulip-daisy?debug=1', wait_until='networkidle')
+            page.goto(BASE + '/studio/tulip-daisy?debug=1&quality=standard', wait_until='networkidle')
             wait_scene(page)
             no_overflow(page, f'studio {w}x{h}')
             page.screenshot(path=str(OUT / f'm-{w}x{h}-peek.png'))

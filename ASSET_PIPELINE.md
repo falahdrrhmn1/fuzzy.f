@@ -42,9 +42,17 @@ daisy, sunflower, gerbera, rose (spiral), daun, sprig manik, tangkai. Pembungkus
 `src/three/bouquet.ts`: lembar kertas mengipas (belakang tinggi, depan rendah), lapisan mesh, cellophane,
 selongsong pegangan, pita, dan lampu.
 
-Setiap kelopak berupa **loop tabung kawat** (diameter ±7 mm). Kelopak "terisi" dibuat dari beberapa loop
-konsentris, seperti lilitan aslinya. Bulu disimulasikan dengan normal map serat dan *sheen*, bukan helai
-geometri, sehingga murah dan tidak tampak plastik.
+Kelopak pipe cleaner yang dililit rapat dimodelkan sebagai **permukaan melengkung terisi** (cekung melintang,
+lengkung memanjang, gradasi pangkal gelap → ujung terang) bertekstur rusuk lilitan, plus **bingkai tabung kawat**
+(±7 mm) di tepinya. Tulip = cangkir 3+3 kelopak sangat cekung; lily = 6 kelopak lebar melengkung keluar + stamen.
+Bunga pendek (daisy, gerbera) otomatis dimajukan agar tidak tenggelam di antara tulip. Kepala bunga disusun pada
+"wajah" buket yang menghadap depan-atas, seperti foto katalog.
+
+Pembungkus: lembar kertas persegi mengipas dua lapis (luar = `wrapper`, dalam = `wrapper2` atau versi lebih
+terang), lembar depan rendah dan terlipat keluar, lebar total dirancang dalam dua iterasi agar = W. Opsi resep:
+`wrapperPattern` (plain/check/stripe), `ribbonPattern` (mis. gingham), `heartSticker`.
+
+Bulu: normal map serat + *sheen* di mode Ringan; mode Bagus menambah 2 lapis *shell fur*.
 
 ## Menambah buket baru
 

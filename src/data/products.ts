@@ -43,12 +43,12 @@ const raw: Product[] = [
         { type: 'tulip', count: 6, color: 'tulip' },
         { type: 'daisy', count: 3, color: 'daisy' },
       ],
-      sprigs: 3, leaves: 2, wrapperSheets: 10, meshLayer: true, cellophane: false, fairyLights: false,
+      sprigs: 3, leaves: 2, wrapperSheets: 10, meshLayer: true, cellophane: false, fairyLights: false, wrapperPattern: 'plain', heartSticker: true, ribbonPattern: 'plain',
     },
     variants: [
       {
         id: 'pink', label: 'Pink', sizeConfirmed: true, photos: [photo('pink-lily-tulip', 1)],
-        palette: { lily: '#F2A7B5', tulip: '#EE9AAE', daisy: '#FBFAF7', center: '#F2C94C', wrapper: '#F4A79B', mesh: '#FFFFFF', ribbon: '#F6B7C3', stem: '#6E9B4E', leaf: '#86B35A' },
+        palette: { lily: '#F2A7B5', tulip: '#EE9AAE', daisy: '#FBFAF7', center: '#F2C94C', wrapper: '#F4A79B', wrapper2: '#FBE3DD', mesh: '#FFFFFF', ribbon: '#F6B7C3', stem: '#6E9B4E', leaf: '#86B35A' },
       },
       {
         id: 'biru', label: 'Biru', sizeConfirmed: true, photos: [photo('pink-lily-tulip', 2)],
@@ -74,12 +74,12 @@ const raw: Product[] = [
         { type: 'tulip', count: 3, color: 'tulip2' },
         { type: 'daisy', count: 4, color: 'daisy' },
       ],
-      sprigs: 3, leaves: 2, wrapperSheets: 10, meshLayer: true, cellophane: false, fairyLights: false,
+      sprigs: 3, leaves: 2, wrapperSheets: 10, meshLayer: true, cellophane: false, fairyLights: false, wrapperPattern: 'plain', heartSticker: false, ribbonPattern: 'plain',
     },
     variants: [
       {
         id: 'standar', label: 'Standar', sizeConfirmed: true, photos: [photo('sunflower-tulip', 1)],
-        palette: { sunflower: '#F5C211', disk: '#5A3A1E', tulip: '#F28C28', tulip2: '#F6B42C', daisy: '#FBFAF7', center: '#F2C94C', wrapper: '#C9D6B4', mesh: '#FFFFFF', ribbon: '#EFE3C8', stem: '#6E9B4E', leaf: '#86B35A' },
+        palette: { sunflower: '#F5C211', disk: '#5A3A1E', tulip: '#F28C28', tulip2: '#F6B42C', daisy: '#FBFAF7', center: '#F2C94C', wrapper: '#C9D6B4', wrapper2: '#F3F5EC', mesh: '#FFFFFF', ribbon: '#EFE3C8', stem: '#6E9B4E', leaf: '#86B35A' },
       },
     ],
   },
@@ -101,7 +101,7 @@ const raw: Product[] = [
         { type: 'tulip', count: 2, color: 'tulip' },
         { type: 'tulip', count: 1, color: 'tulip2' },
       ],
-      sprigs: 0, leaves: 4, wrapperSheets: 9, meshLayer: false, cellophane: false, fairyLights: false,
+      sprigs: 0, leaves: 4, wrapperSheets: 9, meshLayer: false, cellophane: false, fairyLights: false, wrapperPattern: 'stripe', heartSticker: false, ribbonPattern: 'plain',
     },
     variants: [
       {
@@ -127,13 +127,13 @@ const raw: Product[] = [
         { type: 'lily', count: 1, color: 'lily2', scale: 1.1 },
         { type: 'tulip', count: 4, color: 'tulip' },
       ],
-      sprigs: 0, leaves: 3, wrapperSheets: 9, meshLayer: false, cellophane: false, fairyLights: false,
+      sprigs: 0, leaves: 3, wrapperSheets: 9, meshLayer: false, cellophane: false, fairyLights: false, wrapperPattern: 'check', heartSticker: true, ribbonPattern: 'check',
     },
     variants: [
       {
         id: 'pink', label: 'Pink', sizeConfirmed: true,
         photos: [photo('pink-tulip-lily', 1), photo('pink-tulip-lily', 3), photo('pink-tulip-lily', 4)],
-        palette: { lily: '#F6B8C4', lily2: '#EE8FA9', tulip: '#F3A6B5', wrapper: '#F2B5C0', ribbon: '#C8323C', stem: '#6E9B4E', leaf: '#86B35A' },
+        palette: { lily: '#F6B8C4', lily2: '#EE8FA9', tulip: '#F3A6B5', wrapper: '#F2B5C0', wrapper2: '#F7D3D9', ribbon: '#C8323C', stem: '#6E9B4E', leaf: '#86B35A' },
       },
       {
         id: 'ungu', label: 'Ungu & putih', sizeConfirmed: true, photos: [photo('pink-tulip-lily', 2)],
@@ -161,7 +161,7 @@ const raw: Product[] = [
         { type: 'tulip', count: 3, color: 'tulip' },
         { type: 'daisy', count: 4, color: 'daisy' },
       ],
-      sprigs: 4, leaves: 2, wrapperSheets: 11, meshLayer: true, cellophane: true, fairyLights: false,
+      sprigs: 4, leaves: 2, wrapperSheets: 11, meshLayer: true, cellophane: true, fairyLights: false, wrapperPattern: 'plain', heartSticker: true, ribbonPattern: 'plain',
     },
     variants: [
       {
@@ -191,12 +191,12 @@ const raw: Product[] = [
         { type: 'tulip', count: 6, color: 'tulip2' },
         { type: 'daisy', count: 7, color: 'daisy' },
       ],
-      sprigs: 0, leaves: 4, wrapperSheets: 12, meshLayer: true, cellophane: false, fairyLights: false,
+      sprigs: 0, leaves: 4, wrapperSheets: 12, meshLayer: true, cellophane: false, fairyLights: false, wrapperPattern: 'plain', heartSticker: true, ribbonPattern: 'plain',
     },
     variants: [
       {
         id: 'pink', label: 'Pink', sizeConfirmed: true, photos: [photo('tulip-daisy', 1)],
-        palette: { tulip: '#F2A0BA', tulip2: '#E26D96', daisy: '#FBFAF7', center: '#F2C94C', wrapper: '#F6D7CF', mesh: '#FFFFFF', ribbon: '#EE8FB0', stem: '#6E9B4E', leaf: '#86B35A' },
+        palette: { tulip: '#F2A0BA', tulip2: '#E26D96', daisy: '#FBFAF7', center: '#F2C94C', wrapper: '#F6D7CF', wrapper2: '#FCEFEA', mesh: '#FFFFFF', ribbon: '#EE8FB0', stem: '#6E9B4E', leaf: '#86B35A' },
       },
       {
         id: 'hitam', label: 'Hitam (putih & merah tua)', sizeConfirmed: true, photos: [photo('tulip-daisy', 2)],
@@ -237,7 +237,7 @@ const raw: Product[] = [
         { type: 'tulip', count: 11, color: 'tulip' },
         { type: 'tulip', count: 11, color: 'tulip2' },
       ],
-      sprigs: 0, leaves: 0, wrapperSheets: 12, meshLayer: false, cellophane: false, fairyLights: true,
+      sprigs: 0, leaves: 0, wrapperSheets: 12, meshLayer: false, cellophane: false, fairyLights: true, wrapperPattern: 'plain', heartSticker: false, ribbonPattern: 'plain',
     },
     variants: [
       {

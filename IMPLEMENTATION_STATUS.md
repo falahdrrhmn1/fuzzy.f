@@ -1,4 +1,4 @@
-# Status implementasi (2026-10-22)
+# Status implementasi (2026-10-23)
 
 ## Selesai dan teruji
 
@@ -19,8 +19,11 @@
 | Fallback tanpa WebGL (foto + ukuran), error boundary, loading state | e2e (Chromium dengan `--disable-webgl`) |
 | Lazy load three.js hanya di studio; draw call 9–24 per scene; heap stabil ±23–25 MB setelah 16× ganti produk | build output + pengukuran Playwright |
 | Impor GLB pengganti model (`model.kind = 'glb'`) dengan kalibrasi yang sama | unit test `bouquetFromScene` |
+| Dua mode kualitas: **Ringan** (54–111k segitiga, tanpa shadow map/pasca-proses) dan **Bagus** (288–561k segitiga, shadow map lembut, N8AO, bloom, shell fur, detail tinggi); ukuran identik; pilihan tersimpan | unit test + e2e (ganti ke Bagus: Box3 sama ±2 mm, tanpa error) |
+| Bunga kelopak terisi (tulip cangkir, lily lebar, daisy/gerbera/sunflower), pembungkus lembar persegi dua lapis + motif, pita simpul besar (gingham), stiker hati | perbandingan visual dengan foto (screenshot) |
+| Avatar berpakaian (blus+rok / kaos+celana), rambut, wajah (rahang, hidung, telinga), tangan dengan ibu jari, sepatu | screenshot; tinggi tetap diuji ±0,5% |
 
-Hasil terakhir: `typecheck` bersih, `lint` bersih, `vitest` 29/29, `e2e/smoke.py` 0 gagal (log di
+Hasil terakhir: `typecheck` bersih, `lint` bersih, `vitest` 31/31, `e2e/smoke.py` 0 gagal (log di
 `e2e/last-run.txt`).
 
 ## Masih demonstrasi / representatif
@@ -38,10 +41,12 @@ Hasil terakhir: `typecheck` bersih, `lint` bersih, `vitest` 29/29, `e2e/smoke.py
 
 - **Berat badan** hanya mengubah lingkar tubuh dengan satu faktor dari BMI. Tidak ada morph target atau preset
   bentuk tubuh, dan bentuk asli bisa berbeda (dinyatakan di UI).
-- **Pose memegang** adalah IK dua tulang statis. Jari tidak dimodelkan (tangan berupa elipsoid). Tidak ada
+- **Pose memegang** adalah IK dua tulang statis. Jari disederhanakan (telapak + blok jari + ibu jari). Tidak ada
   variasi pose (misalnya satu tangan atau menggendong di lengan).
-- **Avatar** berupa manekin procedural (tanpa aset pihak ketiga, jadi bebas lisensi). Proporsinya mengikuti
-  tabel antropometri, tapi tidak photorealistic.
+- **Avatar** procedural berpakaian sederhana (tanpa aset pihak ketiga, jadi bebas lisensi). Proporsinya
+  mengikuti tabel antropometri, tapi tidak photorealistic dan tanpa detail wajah (mata/mulut).
+- **Kemiripan bunga** dengan foto sudah jauh lebih dekat, tetapi tetap representasi: jumlah/posisi bunga dan
+  bentuk bagian belakang diperkirakan dari satu foto.
 - **Impor GLB** belum diuji end-to-end dengan file `.glb` sungguhan di browser, baru konversi scene → kalibrasi
   di unit test.
 
@@ -53,10 +58,10 @@ Hasil terakhir: `typecheck` bersih, `lint` bersih, `vitest` 29/29, `e2e/smoke.py
 
 ## Hasil pengujian
 
-- Unit (Node): 29 test di `src/three/__tests__/core.test.ts`.
-- Browser (Chromium 156 headless, WebGL via **SwiftShader/CPU**): 60 pengecekan di `e2e/smoke.py`, mencakup
+- Unit (Node): 31 test di `src/three/__tests__/core.test.ts`.
+- Browser (Chromium 156 headless, WebGL via **SwiftShader/CPU**): 63 pengecekan di `e2e/smoke.py`, mencakup
   katalog 5 lebar layar, studio desktop 1440×900, 7 produk, mobile 360×740, 390×844, 430×932, landscape
-  844×390 (touch emulation), dan tanpa WebGL.
+  844×390 (touch emulation), tanpa WebGL, dan perpindahan ke mode Bagus.
 - Performa (headless, 390×844):
   - katalog siap dalam 0,7 s; studio siap (scene pertama) dalam 1,5 s, dari localhost;
   - heap JS 21 MB;
@@ -65,7 +70,8 @@ Hasil terakhir: `typecheck` bersih, `lint` bersih, `vitest` 29/29, `e2e/smoke.py
 
 ## Yang BELUM diuji (jujur)
 
-- HP fisik Android dan iPhone, termasuk Safari/iOS. Belum ada FPS terukur di GPU nyata.
+- HP fisik Android dan iPhone, termasuk Safari/iOS. Belum ada FPS terukur di GPU nyata, termasuk **mode Bagus**
+  (dirancang untuk laptop/desktop; di HP kelas menengah kemungkinan berat, makanya default HP = Ringan).
 - Firefox dan Safari desktop.
 - Gestur pinch dua jari asli (hanya drag satu jari yang diemulasikan; pinch ditangani camera-controls).
 - File `.glb` nyata.

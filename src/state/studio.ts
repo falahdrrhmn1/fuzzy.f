@@ -2,6 +2,12 @@ import { clamp, HEIGHT_RANGE_CM, WEIGHT_RANGE_KG, type Sex } from '../lib/anthro
 
 export type Mode = 'inspect' | 'compare' | 'hold';
 export type CameraPreset = 'default' | 'front' | 'side' | 'back' | 'top';
+/** standard = Ringan (HP biasa), high = Bagus (bayangan, AO, bulu, detail tinggi) */
+export type Quality = 'standard' | 'high';
+export const QUALITIES: { id: Quality; label: string; hint: string }[] = [
+  { id: 'standard', label: 'Ringan', hint: 'Cepat, cocok untuk HP' },
+  { id: 'high', label: 'Bagus', hint: 'Bayangan, kedalaman & bulu lebih nyata' },
+];
 
 export interface StudioState {
   productId: string;
@@ -13,6 +19,7 @@ export interface StudioState {
   showGuides: boolean;
   ortho: boolean;
   autoRotate: boolean;
+  quality: Quality;
   /** Preset kamera + nonce agar klik ulang preset yang sama tetap memicu animasi. */
   camera: { preset: CameraPreset; nonce: number };
 }
@@ -25,7 +32,8 @@ export type StudioAction =
   | { type: 'height'; cm: number }
   | { type: 'weight'; kg: number }
   | { type: 'toggle'; key: 'showGuides' | 'ortho' | 'autoRotate' }
-  | { type: 'camera'; preset: CameraPreset };
+  | { type: 'camera'; preset: CameraPreset }
+  | { type: 'quality'; quality: Quality };
 
 export function initialState(productId: string, variantId: string): StudioState {
   return {
@@ -38,6 +46,7 @@ export function initialState(productId: string, variantId: string): StudioState 
     showGuides: true,
     ortho: false,
     autoRotate: false,
+    quality: 'standard',
     camera: { preset: 'default', nonce: 0 },
   };
 }
@@ -70,5 +79,7 @@ export function studioReducer(s: StudioState, a: StudioAction): StudioState {
       return { ...s, [a.key]: !s[a.key], camera: a.key === 'ortho' ? reframe(s, 'front') : s.camera };
     case 'camera':
       return { ...s, camera: reframe(s, a.preset) };
+    case 'quality':
+      return { ...s, quality: a.quality };
   }
 }
