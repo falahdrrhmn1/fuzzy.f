@@ -1,0 +1,8 @@
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+e2e/screenshots/
+e2e/last-run.txt
+tasks/*.log
+tasks/*.log.err
